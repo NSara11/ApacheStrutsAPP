@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone the GitHub repository
+                git branch: 'master', url: 'https://github.com/NSara11/SBOM.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                // Assuming your Maven project uses the 'pom.xml' file to define the build
+                // Adjust the 'mvn' command options as per your project requirements.
+                sh 'mvn clean install'
+            }
+        }
+        
+        stage('SBOM Scan') {
+            steps {
+                // Assuming you have built a Docker image during the 'Build with Maven' stage
+                // Replace 'your_image_name:tag' with the actual image name and tag
+                sh 'trivy sbom /var/lib/jenkins/.m2/repository/com/scalesec/vulnerable-java-maven/0.0.1-SNAPSHOT/vulnerable-java-maven-0.0.1-SNAPSHOT-cyclonedx.json'
+            }
+        }
+        
+    }
+}
